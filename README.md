@@ -15,20 +15,20 @@ This project was developed with the following technologies:
 ### Cloning repository
 
 ```bash
-$ git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
+git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
   ```
 
 ### install dependencies
  ```bash
-  $ python3 -m venv venv
-  $ source venv/bin/activate
-  $ pip3 install -r requirements.txt
+  python3 -m venv venv
+  source venv/bin/activate
+  pip3 install -r requirements.txt
   ```
 
 ### run
 
  ```bash
-  $ fastapi dev main.py
+  fastapi dev main.py
   ```
 
 ### docs
