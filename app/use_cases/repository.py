@@ -12,11 +12,10 @@ class Repository:
 
         response = requests.get(url)
 
-        if response.status_code == 200:
-            repos = response.json()
-            return repos, response.status_code
-        else:
+        if response.status_code != 200:
             return {"error": "Unable to fetch repositories"}, response.status_code
+        repos = response.json()
+        return repos, response.status_code
 
 
 repository = Repository()
