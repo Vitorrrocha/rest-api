@@ -28,6 +28,7 @@ git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
 ### run
 
  ```bash
+  cd app
   fastapi dev main.py
   ```
 
