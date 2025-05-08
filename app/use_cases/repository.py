@@ -10,11 +10,14 @@ BASE_URL = "https://api.github.com/"
 
 class Repository:
 
+    def __init__(self):
+        self.session = requests.Session()
+        self.headers = get_headers()
+
     def get_user_data(self, user_name: str):
         """Get user data."""
         url = f"{BASE_URL}/users/{user_name}"
-        headers = get_headers()
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url, headers=self.headers)
         status_code = response.status_code
         if status_code != 200:
             return {"error": "Unable to fetch user data"}, status_code
@@ -23,8 +26,7 @@ class Repository:
     def list_repositories(self, user_name: str):
         """Get the list of repositories for a given user."""
         url = f"{BASE_URL}/users/{user_name}/repos"
-        headers = get_headers()
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url, headers=self.headers)
 
         if response.status_code != 200:
             return {"error": f"Unable to fetch {user_name} repositories"}, response.status_code
@@ -34,9 +36,8 @@ class Repository:
     def create_repository(self, payload: CreateRepoRequest):
         """Create repository."""
         url = f"{BASE_URL}/user/repos"
-        headers = get_headers()
         json = payload.model_dump(exclude_none=True)
-        response = requests.post(url, json=json, headers=headers)
+        response = self.session.post(url, json=json, headers=self.headers)
         status_code = response.status_code
         if status_code != 201:
             return {"error": "Unable to create repository"}, status_code
@@ -45,8 +46,7 @@ class Repository:
     def delete_repository(self, owner: str, repo: str):
         """Delete repository."""
         url = f"{BASE_URL}/repos/{owner}/{repo}"
-        headers = get_headers()
-        response = requests.delete(url, headers=headers)
+        response = self.session.delete(url, headers=self.headers)
         status_code = response.status_code
         if status_code != 204:
             return {"error": "Unable to delete repository"}, status_code
@@ -55,8 +55,7 @@ class Repository:
     def get_repository_data(self, owner: str, repo: str):
         """Get repository data."""
         url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
-        headers = get_headers()
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url, headers=self.headers)
         status_code = response.status_code
         if status_code != 200:
             return {"error": "Unable to fetch repository data"}, status_code
