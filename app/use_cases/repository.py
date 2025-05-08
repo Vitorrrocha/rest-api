@@ -1,14 +1,16 @@
 import requests
+import os
 
-base_url = "https://api.github.com/"
+from app.schema_validators import CreateRepoRequest
+
+TOKEN = os.getenv("GITHUB_TOKEN_CREDENTIAL")
+BASE_URL = "https://api.github.com/"
 
 
 class Repository:
-    def list_repository(self, username: str):
-        """
-        Get the list of repositories for a given user.
-        """
-        url = f"{base_url}/users/{username}/repos"
+    def list_repositories(self, username: str):
+        """Get the list of repositories for a given user."""
+        url = f"{BASE_URL}/users/{username}/repos"
 
         response = requests.get(url)
 
@@ -16,6 +18,18 @@ class Repository:
             return {"error": "Unable to fetch repositories"}, response.status_code
         repos = response.json()
         return repos, response.status_code
+
+    def create_repository(self, payload: CreateRepoRequest):
+        """Create repository."""
+        url = f"{BASE_URL}/user/repos"
+        headers = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"}
+        json = payload.model_dump(exclude_none=True)
+        response = requests.post(url, json=json, headers=headers)
+        print(f"Status Code: {response.status_code}")
+        print(response.text)
+        if response.status_code != 201:
+            return {"error": "Unable to create repository"}, response.status_code
+        return response.json(), response.status_code
 
 
 repository = Repository()
