@@ -25,8 +25,6 @@ class Repository:
         headers = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"}
         json = payload.model_dump(exclude_none=True)
         response = requests.post(url, json=json, headers=headers)
-        print(f"Status Code: {response.status_code}")
-        print(response.text)
         if response.status_code != 201:
             return {"error": "Unable to create repository"}, response.status_code
         return response.json(), response.status_code
