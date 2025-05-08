@@ -61,7 +61,7 @@ class Repository:
         if status_code != 200:
             return {"error": "Unable to fetch repository data"}, status_code
         pull_requests_open = len(response.json())
-        if len(response.json()) == 0:
+        if pull_requests_open == 0:
             return {"error": "No pull requests found"}, 404
         user_contributors_data = []
         for pr in response.json():
