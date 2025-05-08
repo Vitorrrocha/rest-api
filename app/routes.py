@@ -14,6 +14,7 @@ def read_root():
 
 @router.get("/user/{user_name}/repos")
 def on_user_list_repos(user_name: str):
+    """List all user repositories."""
     response, status_code = repository.list_repositories(user_name)
     if status_code == 200:
         return response
@@ -23,6 +24,7 @@ def on_user_list_repos(user_name: str):
 
 @router.post("/create/repo")
 def on_create_user_repo(payload: CreateRepoRequest):
+    """Create a repository."""
     response, status_code = repository.create_repository(payload)
     if status_code == 201:
         return response

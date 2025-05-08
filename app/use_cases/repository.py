@@ -25,6 +25,7 @@ class Repository:
 
     def list_repositories(self, user_name: str):
         """Get the list of repositories for a given user."""
+        # TODO: start thinking about pagination
         url = f"{BASE_URL}/users/{user_name}/repos"
         response = self.session.get(url, headers=self.headers)
 
