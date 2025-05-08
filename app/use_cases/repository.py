@@ -1,21 +1,30 @@
 from fastapi import Response
 from fastapi.responses import JSONResponse
 import requests
-import os
 
 from app.schema_validators import CreateRepoRequest
+from app.utils import get_headers
 
-TOKEN = os.getenv("GITHUB_TOKEN_CREDENTIAL")
 BASE_URL = "https://api.github.com/"
 
 
 class Repository:
 
+    def get_user_data(self, user_name: str):
+        """Get user data."""
+        url = f"{BASE_URL}/users/{user_name}"
+        headers = get_headers()
+        response = requests.get(url, headers=headers)
+        status_code = response.status_code
+        if status_code != 200:
+            return {"error": "Unable to fetch user data"}, status_code
+        return response.json(), status_code
+
     def list_repositories(self, user_name: str):
         """Get the list of repositories for a given user."""
         url = f"{BASE_URL}/users/{user_name}/repos"
-
-        response = requests.get(url)
+        headers = get_headers()
+        response = requests.get(url, headers=headers)
 
         if response.status_code != 200:
             return {"error": f"Unable to fetch {user_name} repositories"}, response.status_code
@@ -25,7 +34,7 @@ class Repository:
     def create_repository(self, payload: CreateRepoRequest):
         """Create repository."""
         url = f"{BASE_URL}/user/repos"
-        headers = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"}
+        headers = get_headers()
         json = payload.model_dump(exclude_none=True)
         response = requests.post(url, json=json, headers=headers)
         status_code = response.status_code
@@ -36,12 +45,31 @@ class Repository:
     def delete_repository(self, owner: str, repo: str):
         """Delete repository."""
         url = f"{BASE_URL}/repos/{owner}/{repo}"
-        headers = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"}
+        headers = get_headers()
         response = requests.delete(url, headers=headers)
         status_code = response.status_code
         if status_code != 204:
             return {"error": "Unable to delete repository"}, status_code
         return Response(status_code=status_code), status_code
+
+    def get_repository_data(self, owner: str, repo: str):
+        """Get repository data."""
+        url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
+        headers = get_headers()
+        response = requests.get(url, headers=headers)
+        status_code = response.status_code
+        if status_code != 200:
+            return {"error": "Unable to fetch repository data"}, status_code
+        pull_requests_open = len(response.json())
+        if len(response.json()) == 0:
+            return {"error": "No pull requests found"}, 404
+        user_contributors_data = []
+        for pr in response.json():
+            user_name = pr["user"]["login"]
+            user_data_response = self.get_user_data(user_name=user_name)
+            email = user_data_response[0]["email"] if user_data_response[0]["email"] else "Email not found"
+            user_contributors_data.append({"name": pr["user"]["login"], "email": email})
+        return JSONResponse(content=user_contributors_data, status_code=status_code), status_code
 
 
 repository = Repository()

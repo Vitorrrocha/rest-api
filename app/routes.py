@@ -38,3 +38,13 @@ def on_delete_user_repo(owner: str, repo: str):
         return response
     else:
         raise HTTPException(status_code=status_code, detail=response)
+
+
+@router.get("/repo/data/{owner}/{repo}")
+def on_get_repo_data(owner: str, repo: str):
+    """Get repository data."""
+    response, status_code = repository.get_repository_data(owner=owner, repo=repo)
+    if status_code == 200:
+        return response
+    else:
+        raise HTTPException(status_code=status_code, detail=response)
