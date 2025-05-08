@@ -21,10 +21,20 @@ def on_user_list_repos(user_name: str):
         raise HTTPException(status_code=status_code, detail=response)
 
 
-@router.post("/create_repo")
+@router.post("/create/repo")
 def on_create_user_repo(payload: CreateRepoRequest):
     response, status_code = repository.create_repository(payload)
-    if status_code == 200:
+    if status_code == 201:
+        return response
+    else:
+        raise HTTPException(status_code=status_code, detail=response)
+
+
+@router.delete("/delete/{owner}/{repo}")
+def on_delete_user_repo(owner: str, repo: str):
+    """Delete a repository."""
+    response, status_code = repository.delete_repository(owner=owner, repo=repo)
+    if status_code == 204:
         return response
     else:
         raise HTTPException(status_code=status_code, detail=response)
