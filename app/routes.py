@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from typing import Union
+import json
 
 from app.use_cases.repository import repository
 from app.schema_validators import CreateRepoRequest
@@ -15,38 +16,26 @@ def read_root():
 @router.get("/user/{user_name}/repos")
 def on_user_list_repos(user_name: str):
     """List all user repositories."""
-    response, status_code = repository.list_repositories(user_name)
-    if status_code == 200:
-        return response
-    else:
-        raise HTTPException(status_code=status_code, detail=response)
+    response = repository.list_repositories(user_name)
+    return response
 
 
 @router.post("/create/repo")
 def on_create_user_repo(payload: CreateRepoRequest):
     """Create a repository."""
-    response, status_code = repository.create_repository(payload)
-    if status_code == 201:
-        return response
-    else:
-        raise HTTPException(status_code=status_code, detail=response)
+    response = repository.create_repository(payload)
+    return response
 
 
 @router.delete("/delete/{owner}/{repo}")
 def on_delete_user_repo(owner: str, repo: str):
     """Delete a repository."""
-    response, status_code = repository.delete_repository(owner=owner, repo=repo)
-    if status_code == 204:
-        return response
-    else:
-        raise HTTPException(status_code=status_code, detail=response)
+    response = repository.delete_repository(owner=owner, repo=repo)
+    return response
 
 
 @router.get("/repo/data/{owner}/{repo}")
 def on_get_repo_data(owner: str, repo: str):
     """Get repository data."""
-    response, status_code = repository.get_repository_data(owner=owner, repo=repo)
-    if status_code == 200:
-        return response
-    else:
-        raise HTTPException(status_code=status_code, detail=response)
+    response = repository.get_repository_data(owner=owner, repo=repo)
+    return response
