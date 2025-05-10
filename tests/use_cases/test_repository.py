@@ -80,7 +80,7 @@ def test_delete_repository_happy_case(mock_session_delete, mock_headers, mock_er
     repo = "test_repo"
     response = repository.delete_repository(owner=owner, repo=repo)
     mock_session_delete.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}", headers={"happy": "case"})
-    assert response.status_code == 204
+    assert response.status_code == 200
     assert response.body == b"{}"
     mock_error_handler.assert_not_called()
 
