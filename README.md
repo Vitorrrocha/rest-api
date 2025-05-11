@@ -16,7 +16,13 @@ This project was developed with the following technologies:
 
 ```bash
 git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
-  ```
+```
+or with docker
+```bash
+docker pull vitorrocha1228/rest-api:latest # docker repository
+
+$ docker run -d -p 8000:8000 rest-api:latest
+```
 
 ### install dependencies
  ```bash
