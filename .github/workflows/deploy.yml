@@ -34,12 +34,6 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Create Kubernetes Secret
-        run: |
-         kubectl create secret generic rest-api-secret \
-            --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
-            --dry-run=client -o yaml | kubectl apply -f -
-
       - name: Deploy to Minikube
         run: |
           kubectl apply -f k8s/deployment.yaml
