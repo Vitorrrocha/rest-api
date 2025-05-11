@@ -19,6 +19,7 @@ jobs:
           driver: docker
           cpus: 2
           memory: 4096
+          extra-options: "--insecure-registry=localhost:5000"
 
       - name: Verify Minikube cluster
         run: kubectl get pods -A
