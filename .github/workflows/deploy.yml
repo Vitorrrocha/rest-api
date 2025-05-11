@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+            repository: medyagh/local-dev-example-with-minikube
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -29,18 +31,21 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/rest-api:latest
 
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
+      - name: Start minikube
+        uses: medyagh/setup-minikube@latest
 
-      - name: Deploy to Minikube
+      - name: Try the cluster!
+        run: kubectl get pods -A
+
+      - name: Create Kubernetes Secret
         run: |
-          kubectl apply -f k8s/deployment.yaml
+         kubectl create secret generic rest-api-secret \
+            --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy to minikube
         run: |
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f deploy/k8s.yaml
           kubectl wait --for=condition=ready pod -l app=rest-api
       - name: Test service URLs
         run: |
