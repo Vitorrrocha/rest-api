@@ -24,7 +24,7 @@ jobs:
         run: bandit -r app/ -ll -ii -o bandit_report.txt || true
 
       - name: Upload Bandit report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2  # Versão corrigida
         with:
           name: bandit-report
           path: bandit_report.txt
