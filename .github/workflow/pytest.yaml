@@ -1,0 +1,44 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Pytests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.12.1
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12.1"
+    - name: Upgrade pip and install pytest
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+    - name: Install project dependencies
+      run: |
+        if [ -f requirements.txt ]; then
+          python -m pip install -r requirements.txt
+        fi
+    - name: Test with pytest and calculate coverage
+      run: |
+        python -m pytest --cov-report "xml:coverage.xml" --cov=. --cov-fail-under=100
+    - name: Create Coverage
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: orgoro/coverage@v3
+      with:
+        coverageFile: coverage.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
