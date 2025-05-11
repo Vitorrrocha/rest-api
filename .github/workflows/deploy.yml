@@ -40,13 +40,17 @@ jobs:
             --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Deploy to Minikube
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+
       - name: Deploy to minikube
         run: |
           kubectl apply -f k8s/deployment.yaml
-          kubectl wait --for=condition=ready pod -l app=local-devex
+          kubectl wait --for=condition=ready pod -l app=rest-api
       - name: Test service URLs
         run: |
           minikube service list
-          minikube service local-devex-svc --url
+          minikube service rest-api-svc --url
           echo -n "------------------opening the service------------------"
-          curl $(minikube service local-devex-svc --url)/version
+          curl $(minikube service rest-api-svc --url)/version
