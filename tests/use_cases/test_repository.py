@@ -1,5 +1,4 @@
 from unittest.mock import patch, MagicMock
-import pytest
 from app.use_cases.repository import repository, BASE_URL
 
 
@@ -29,7 +28,7 @@ def test_list_repository_error_case(mock_session_get, mock_headers, mock_error_h
     mock_session_get.return_value.status_code = 400
     mock_headers.return_value = {"error": "case"}
     user_name = "test_user"
-    response = repository.list_repositories(user_name)
+    repository.list_repositories(user_name)
     mock_session_get.assert_called_once_with(f"{BASE_URL}/users/{user_name}/repos", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
 
@@ -72,7 +71,7 @@ def test_create_repository_error_case(mock_session_post, mock_headers, mock_erro
     mock_headers.return_value = {"error": "case"}
     payload = MagicMock()
     payload.model_dump.return_value = {"payload": "ok"}
-    response = repository.create_repository(payload)
+    repository.create_repository(payload)
     mock_session_post.assert_called_once_with(f"{BASE_URL}/user/repos", json={"payload": "ok"}, headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
 
@@ -114,7 +113,7 @@ def test_delete_repository_error_case(mock_session_delete, mock_headers, mock_er
     mock_headers.return_value = {"error": "case"}
     owner = "test_owner"
     repo = "test_repo"
-    response = repository.delete_repository(owner=owner, repo=repo)
+    repository.delete_repository(owner=owner, repo=repo)
     mock_session_delete.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
 
@@ -164,7 +163,7 @@ def test_get_repository_data_error_case(mock_session_get, mock_get_user_data, mo
     mock_headers.return_value = {"error": "case"}
     owner = "test_owner"
     repo = "test_repo"
-    response = repository.get_repository_data(owner=owner, repo=repo)
+    repository.get_repository_data(owner=owner, repo=repo)
     mock_session_get.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}/pulls", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
     mock_get_user_data.assert_not_called()
@@ -191,7 +190,7 @@ def test_get_repository_data_with_zero_pull_requests_should_return_404(mock_sess
     mock_headers.return_value = {"error": "case"}
     owner = "test_owner"
     repo = "test_repo"
-    response = repository.get_repository_data(owner=owner, repo=repo)
+    repository.get_repository_data(owner=owner, repo=repo)
     mock_session_get.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}/pulls", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(404)
     mock_get_user_data.assert_not_called()
@@ -223,7 +222,7 @@ def test_get_user_data_error_case(mock_session_get, mock_headers, mock_error_han
     mock_session_get.return_value.status_code = 400
     mock_headers.return_value = {"error": "case"}
     user_name = "test_user"
-    response = repository.get_user_data(user_name)
+    repository.get_user_data(user_name)
     mock_session_get.assert_called_once_with(f"{BASE_URL}/users/{user_name}", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
 
