@@ -34,6 +34,15 @@ def test_list_repository_error_case(mock_session_get, mock_headers, mock_error_h
     mock_error_handler.assert_called_once_with(400)
 
 
+def test_list_repository_exception_handling():
+    """Test get user data exception handling."""
+    with patch.object(repository.session, "get", side_effect=Exception("Internal server error")):
+        response = repository.list_repositories("test_user")
+
+        assert response.status_code == 500
+        assert response.body == b'{"error":"Internal server error"}'
+
+
 @patch("app.use_cases.repository.error_handler")
 @patch("app.use_cases.repository.get_headers")
 @patch("app.use_cases.repository.repository.session.post")
@@ -68,6 +77,16 @@ def test_create_repository_error_case(mock_session_post, mock_headers, mock_erro
     mock_error_handler.assert_called_once_with(400)
 
 
+def test_create_repository_exception_handling():
+    """Test get user data exception handling."""
+    with patch.object(repository.session, "post", side_effect=Exception("Internal server error")):
+        payload = MagicMock()
+        response = repository.create_repository(payload)
+
+        assert response.status_code == 500
+        assert response.body == b'{"error":"Internal server error"}'
+
+
 @patch("app.use_cases.repository.error_handler")
 @patch("app.use_cases.repository.get_headers")
 @patch("app.use_cases.repository.repository.session.delete")
@@ -98,6 +117,15 @@ def test_delete_repository_error_case(mock_session_delete, mock_headers, mock_er
     response = repository.delete_repository(owner=owner, repo=repo)
     mock_session_delete.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
+
+
+def test_delete_repository_exception_handling():
+    """Test get user data exception handling."""
+    with patch.object(repository.session, "delete", side_effect=Exception("Internal server error")):
+        response = repository.delete_repository("test_user", "test_repo")
+
+        assert response.status_code == 500
+        assert response.body == b'{"error":"Internal server error"}'
 
 
 @patch("app.use_cases.repository.json")
@@ -142,6 +170,33 @@ def test_get_repository_data_error_case(mock_session_get, mock_get_user_data, mo
     mock_get_user_data.assert_not_called()
 
 
+def test_get_repository_data_exception_handling():
+    """Test get user data exception handling."""
+    with patch.object(repository.session, "get", side_effect=Exception("Internal server error")):
+        response = repository.get_repository_data("test_user", "test_repo")
+
+        assert response.status_code == 500
+        assert response.body == b'{"error":"Internal server error"}'
+
+
+@patch("app.use_cases.repository.error_handler")
+@patch("app.use_cases.repository.get_headers")
+@patch("app.use_cases.repository.repository.get_user_data")
+@patch("app.use_cases.repository.repository.session.get")
+def test_get_repository_data_with_zero_pull_requests_should_return_404(mock_session_get, mock_get_user_data, mock_headers, mock_error_handler):
+    """Test get repository data error case."""
+    mock_session_get.return_value = MagicMock()
+    mock_session_get.return_value.status_code = 200
+    mock_session_get.return_value.json.return_value = []
+    mock_headers.return_value = {"error": "case"}
+    owner = "test_owner"
+    repo = "test_repo"
+    response = repository.get_repository_data(owner=owner, repo=repo)
+    mock_session_get.assert_called_once_with(f"{BASE_URL}/repos/{owner}/{repo}/pulls", headers={"error": "case"})
+    mock_error_handler.assert_called_once_with(404)
+    mock_get_user_data.assert_not_called()
+
+
 @patch("app.use_cases.repository.error_handler")
 @patch("app.use_cases.repository.get_headers")
 @patch("app.use_cases.repository.repository.session.get")
@@ -171,3 +226,12 @@ def test_get_user_data_error_case(mock_session_get, mock_headers, mock_error_han
     response = repository.get_user_data(user_name)
     mock_session_get.assert_called_once_with(f"{BASE_URL}/users/{user_name}", headers={"error": "case"})
     mock_error_handler.assert_called_once_with(400)
+
+
+def test_get_user_data_exception_handling():
+    """Test get user data exception handling."""
+    with patch.object(repository.session, "get", side_effect=Exception("Internal server error")):
+        response = repository.get_user_data("test_user")
+
+        assert response.status_code == 500
+        assert response.body == b'{"error":"Internal server error"}'

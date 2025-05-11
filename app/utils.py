@@ -29,3 +29,6 @@ def error_handler(status_code: int):
     elif status_code == 422:
         content = {"error": "Validation failed or endpoint has been spammed"}
         return JSONResponse(content=content, status_code=status_code)
+    elif status_code == 500:
+        content = {"error": "Internal server error"}
+        return JSONResponse(content=content, status_code=status_code)
