@@ -46,10 +46,10 @@ jobs:
       - name: Deploy to minikube
         run: |
           kubectl apply -f k8s/deployment.yaml
-          kubectl wait --for=condition=ready pod -l app=rest-api
+          kubectl wait --for=condition=ready pod -l app=local-devex
       - name: Test service URLs
         run: |
           minikube service list
-          minikube service rest-api-svc --url
+          minikube service local-devex-svc --url
           echo -n "------------------opening the service------------------"
-          curl $(minikube service rest-api-svc --url)/version
+          curl $(minikube service local-devex-svc --url)/version
