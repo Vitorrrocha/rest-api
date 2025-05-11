@@ -6,50 +6,43 @@ on:
       - master
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-            repository: medyagh/local-dev-example-with-minikube
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/rest-api:latest
-
-      - name: Start minikube
+      - name: Start Minikube
         uses: medyagh/setup-minikube@latest
+        with:
+          driver: docker
+          cpus: 2
+          memory: 4096
 
-      - name: Try the cluster!
+      - name: Verify Minikube cluster
         run: kubectl get pods -A
+
+      - name: Set up Docker environment to use Minikube's Docker daemon
+        run: |
+          eval $(minikube -p minikube docker-env)
+
+      - name: Build Docker image
+        run: |
+          docker build -t local/rest-api:latest .
 
       - name: Create Kubernetes Secret
         run: |
-         kubectl create secret generic rest-api-secret \
+          kubectl create secret generic rest-api-secret \
             --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Deploy to minikube
+      - name: Deploy to Minikube
         run: |
-          kubectl apply -f deploy/k8s.yaml
-          kubectl wait --for=condition=ready pod -l app=local-devex
-      - name: Test service URLs
+          kubectl apply -f k8s/deployment.yaml
+          kubectl rollout status deployment/rest-api
+
+      - name: Expose service and test
         run: |
-          minikube service list
-          minikube service local-devex-svc --url
-          echo -n "------------------opening the service------------------"
-          curl $(minikube service local-devex-svc --url)/version
+          kubectl expose deployment rest-api --type=NodePort --port=8000
+          minikube service rest-api --url

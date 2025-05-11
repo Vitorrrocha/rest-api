@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: rest-api
-          image: vitorrrocha/rest-api:latest
+          image: local/rest-api:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8000
           envFrom:
