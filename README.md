@@ -35,3 +35,6 @@ git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
 ### docs
     {url}/docs
     http://127.0.0.1:8000/docs # for localhost
+
+  Documentation of github api:
+  https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28
