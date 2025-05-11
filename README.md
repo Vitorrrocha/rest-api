@@ -11,7 +11,7 @@ This project was developed with the following technologies:
   - Coverage
   - Docker 🐋
 
-  
+
 ### Cloning repository
 
 ```bash
