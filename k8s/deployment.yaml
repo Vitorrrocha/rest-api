@@ -18,6 +18,10 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-          envFrom:
-            - secretRef:
-                name: rest-api-secret
+          env:
+            - name: GITHUB_TOKEN_CREDENTIAL
+              valueFrom:
+                secretKeyRef:
+                  name: rest-api-secret
+                  key: GITHUB_TOKEN_CREDENTIAL
+
