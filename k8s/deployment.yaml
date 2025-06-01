@@ -1,27 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rest-api
+    name: rest-api
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: rest-api
-  template:
-    metadata:
-      labels:
+    selector:
+        matchLabels:
+            app: rest-api
+    replicas: 2
+    template:
+        metadata:
+            labels:
+                app: rest-api
+        spec:
+            containers:
+                - name: rest-api
+                  imagePullPolicy: Never
+                  image: local/rest-api:latest
+                  resources:
+                      limits:
+                          cpu: 50m
+                          memory: 100Mi
+                      requests:
+                          cpu: 25m
+                          memory: 10Mi
+                  ports:
+                      - containerPort: 8080
+                  env:
+                  - name: GITHUB_TOKEN_CREDENTIAL
+                    valueFrom:
+                      secretKeyRef:
+                        name: rest-api-secret
+                        key: GITHUB_TOKEN_CREDENTIAL
+apiVersion: v1
+kind: Service
+metadata:
+    name: rest-api
+spec:
+    type: NodePort
+    selector:
         app: rest-api
-    spec:
-      containers:
-        - name: rest-api
-          image: local/rest-api:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8000
-          env:
-            - name: GITHUB_TOKEN_CREDENTIAL
-              valueFrom:
-                secretKeyRef:
-                  name: rest-api-secret
-                  key: GITHUB_TOKEN_CREDENTIAL
-
+    ports:
+        - port: 8080
+          targetPort: 8080

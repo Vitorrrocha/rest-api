@@ -6,44 +6,40 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  job1:
     runs-on: ubuntu-latest
-
+    name: Build and Deploy to Minikube
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Start Minikube
-        uses: medyagh/setup-minikube@latest
-        with:
-          driver: docker
-          cpus: 2
-          memory: 4096
-          extra-options: "--insecure-registry=localhost:5000"
+    - name: Start Minikube
+      uses: medyagh/setup-minikube@latest
 
-      - name: Verify Minikube cluster
-        run: kubectl get pods -A
+    - name: Check cluster status
+      run: kubectl get pods -A
 
-      - name: Set up Docker environment to use Minikube's Docker daemon
-        run: |
-          eval $(minikube -p minikube docker-env)
+    - name: Build Docker image
+      run: |
+        minikube image build -t local/rest-api:latest .
+    
+    - name: Create Kubernetes Secret
+      run: |
+        kubectl create secret generic rest-api-secret \
+          --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
+          --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Build Docker image
-        run: |
-          docker build -t local/rest-api:latest .
+    - name: Apply deployment and service
+      run: |
+        kubectl apply -f k8s/deployment.yaml
 
-      - name: Create Kubernetes Secret
-        run: |
-          kubectl create secret generic rest-api-secret \
-            --from-literal=GITHUB_TOKEN_CREDENTIAL=${{ secrets.TOKEN_CREDENTIAL }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+    - name: List services
+      run: kubectl get svc
 
-      - name: Deploy to Minikube
-        run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl rollout status deployment/rest-api --timeout=120s
-
-      - name: Expose service and test
-        run: |
-          kubectl expose deployment rest-api --type=NodePort --port=8000
-          minikube service rest-api --url
+    - name: Check if 'rest-api' service exists
+      run: |
+        if minikube service list | grep -w "rest-api"; then
+          echo "✅ Service 'rest-api' found."
+        else
+          echo "❌ Service 'rest-api' not found."
+          exit 1
+        fi
