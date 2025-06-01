@@ -30,7 +30,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t local/rest-api:latest .
+          docker build -t rest-api:latest .
 
       - name: Create Kubernetes Secret
         run: |
@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Minikube
         run: |
           kubectl apply -f k8s/deployment.yaml
-          kubectl rollout status deployment/rest-api
+          kubectl rollout status deployment/rest-api --timeout=120s
 
       - name: Expose service and test
         run: |
