@@ -57,7 +57,7 @@ git clone https://github.com/Vitorrrocha/rest-api && cd rest-api
 
   
   #### Create docker image
-  ##### Before mmake sure you are in root of the project folder the: /rest-api
+  ##### Before make sure you are in root of the project folder the: /rest-api
   ```bash
     docker build -t rest-api:latest .
   ```
