@@ -61,7 +61,9 @@ $ docker run -d -p 8000:8000 rest-api:latest
     minikube start
   ```
 
+  
   #### Create docker image
+  ##### Before mmake sure you are in root of the project folder the: /rest-api
   ```bash
     docker build -t rest-api:latest .
   ```
@@ -76,11 +78,6 @@ $ docker run -d -p 8000:8000 rest-api:latest
   #### Run deploy
   ```bash
     kubectl apply -f k8s/deployment.yaml
-  ```
-
-#### Expose the port out of the Cluster
-  ```bash
-    kubectl expose deployment rest-api --type=NodePort --port=8000
   ```
   
 #### List the services and get the URL
